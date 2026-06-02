@@ -1,0 +1,18 @@
+# Data layers (medallion) — never commit raw/intermediate data
+data/bronze/
+data/silver/
+data/gold/
+data/_metadata/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
