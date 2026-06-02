@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bd ready *)",
+      "Bash(bd show *)",
+      "Bash(bd stats *)",
+      "Bash(uv run *)",
+      "Bash(git add *)"
+    ]
+  }
+}

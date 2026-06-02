@@ -1,0 +1,40 @@
+# {{name}} — AI Agent Instructions
+
+## Domain / Scientific Context
+
+<!-- The real-world problem this project addresses. State the claim/objective, the outcome,
+     and — critically — the data provenance (own data? regional/Peruvian domain? public source?).
+     This is the differentiator; be concrete. -->
+
+- **Problem**: <!-- fill -->
+- **Outcome / target**: <!-- fill -->
+- **Data provenance**: <!-- fill: source, ownership, how acquired -->
+
+## Architecture
+
+<!-- How the project runs. If it's a pipeline, describe the stages and the data flow between them. -->
+
+```bash
+# e.g. uv run ingest && uv run features && uv run model
+```
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/{{pkg}}/...` | <!-- fill --> |
+| `configs/...` | <!-- fill --> |
+
+## Data Conventions
+
+<!-- Adjust/remove if this is not a data project. Defaults reflect the medallion + polars/duckdb stack. -->
+
+- **Layers**: raw → `data/bronze/`, cleaned → `data/silver/`, analytic → `data/gold/`. All gitignored.
+- **Polars over pandas** everywhere; only drop to numpy when a library requires it.
+- **DuckDB for SQL joins** across parquet; Polars for local transforms.
+- **Remote silver**: reference the remote root via `$SILVER` in SQL when pulling shared data.
+- Keep dates as typed `Date`, never strings, in intermediate tables.
+
+## Conventions
+
+<!-- Project-specific rules: ID normalization, seeds, temporal discipline, naming, etc. -->

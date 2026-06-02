@@ -1,0 +1,13 @@
+{
+  "name": "project-kit",
+  "version": "0.1.0",
+  "description": "Bootstrap a new project with Rody's standard setup (beads, uv, CLAUDE.md/AGENTS.md, CI) and research new tooling to evolve the kit",
+  "keywords": [
+    "scaffold",
+    "bootstrap",
+    "beads",
+    "uv",
+    "ci",
+    "setup"
+  ]
+}

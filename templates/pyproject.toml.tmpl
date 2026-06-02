@@ -1,0 +1,25 @@
+[project]
+name = "{{name}}"
+version = "0.1.0"
+description = "TODO: one-line description"
+requires-python = ">={{python}}"
+dependencies = [
+{{deps}}
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{pkg}}"]
+
+[tool.ruff]
+line-length = 100
+target-version = "{{target_version}}"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

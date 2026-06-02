@@ -1,0 +1,14 @@
+{
+  "name": "project-kit-local",
+  "description": "Local marketplace for project-kit — project bootstrapping and setup-evolution tooling",
+  "owner": {
+    "name": "Rody Vilchez"
+  },
+  "plugins": [
+    {
+      "name": "project-kit",
+      "description": "Scaffold a new project with the standard beads + uv + CLAUDE/AGENTS + CI setup, and research new tooling for the kit",
+      "source": "./"
+    }
+  ]
+}
