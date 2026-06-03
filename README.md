@@ -57,7 +57,7 @@ Or add to `~/.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": {
-    "project-kit-local": { "source": { "source": "directory", "path": "/home/rosewt-dell/Code/project-kit" } }
+    "project-kit-local": { "source": { "source": "directory", "path": "/path/to/project-kit" } }
   },
   "enabledPlugins": { "project-kit@project-kit-local": true }
 }
