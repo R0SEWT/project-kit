@@ -1,0 +1,9 @@
+# Define code owners here once this repo has collaborators.
+#
+# A live pattern auto-assigns reviewers on matching PRs. Combined with branch
+# protection's "Require review from Code Owners", it can BLOCK merges. On a
+# solo-dev repo GitHub won't let you review your own PRs, so a live rule only
+# produces dead review assignments. Leave this commented until people join.
+#
+# Example (uncomment and set your handle):
+# * @your-handle

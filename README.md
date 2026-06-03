@@ -24,7 +24,7 @@ identified (only 3 of 83 repos had active CI).
 --profile P        data | python | minimal   (default: data)
 --python X.Y       Python version (default: 3.11)
 --no-data          Skip data/{bronze,silver,gold}
---no-ci            Skip GitHub Actions CI + smoke test
+--no-github        Skip .github/ (CI + smoke test, dependabot, PR template, CODEOWNERS)
 --no-mcp           Skip .mcp.json (playwright/context7)
 --backup           Back up existing files to <file>.bak-<ts>
 --force            Overwrite existing files
@@ -41,8 +41,9 @@ and `bd init` is skipped if `.beads/` already exists.
 
 What gets laid down (data profile): `pyproject.toml`, `.gitignore`, `src/<pkg>/`, `data/{bronze,silver,gold}/`,
 `.claude/settings.json` (bd-prime hooks) + `.claude/settings.local.json` (minimal safe perms),
-`CLAUDE.md` + `AGENTS.md`, `.beads/` (via `bd init`), `.github/workflows/ci.yml` + `tests/test_smoke.py`,
-and optional `.mcp.json`. Then `uv sync`.
+`CLAUDE.md` + `AGENTS.md`, `.beads/` (via `bd init`), a collab-ready `.github/`
+(`workflows/ci.yml` + `tests/test_smoke.py`, `dependabot.yml`, `pull_request_template.md`, a commented
+`CODEOWNERS`), and optional `.mcp.json`. Then `uv sync`.
 
 ## Install
 
