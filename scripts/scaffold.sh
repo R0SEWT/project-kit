@@ -146,11 +146,25 @@ else
   note "bd not found on PATH — install beads, then run 'bd init' here"
 fi
 
-# 7. CI + smoke test
+# 7. GitHub collaboration hygiene (CI + smoke test, dependabot, PR template, CODEOWNERS)
 if $WANT_GITHUB; then
+  # Invariant: the static dependabot.yml declares a `uv` ecosystem, so it assumes a
+  # Python project. WANT_GITHUB implies WANT_PY today ONLY because `minimal` is the sole
+  # no-Python profile and it also disables GitHub hygiene. If a future profile turns on
+  # GitHub hygiene without Python, that uv update would be wrong — fail loud here rather
+  # than silently emit a broken dependabot.yml. (Fix = make templates/dependabot.yml
+  # conditional, then drop this guard.)
+  if ! $WANT_PY; then
+    echo "error: WANT_GITHUB without a Python project — templates/dependabot.yml assumes uv." >&2
+    echo "       Make dependabot.yml conditional before adding a GitHub-without-Python profile." >&2
+    exit 1
+  fi
   mkdirp "$TARGET/.github/workflows"; mkdirp "$TARGET/tests"
   emit_render "$TPL/ci.yml.tmpl" "$TARGET/.github/workflows/ci.yml"
   emit "$TARGET/tests/test_smoke.py" < "$TPL/test_smoke.py"
+  emit "$TARGET/.github/dependabot.yml" < "$TPL/dependabot.yml"
+  emit "$TARGET/.github/pull_request_template.md" < "$TPL/pull_request_template.md"
+  emit "$TARGET/.github/CODEOWNERS" < "$TPL/CODEOWNERS"
 fi
 
 # 8. MCP
