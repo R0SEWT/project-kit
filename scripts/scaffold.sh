@@ -10,7 +10,7 @@
 #   --profile P        data | python | minimal  (default: data)
 #   --python X.Y       Python version (default: 3.11)
 #   --no-data          Skip data/{bronze,silver,gold} dirs (data profile only)
-#   --no-ci            Skip GitHub Actions CI + smoke test
+#   --no-github        Skip GitHub Actions CI + smoke test
 #   --no-mcp           Skip .mcp.json (playwright/context7)
 #   --backup           Back up existing files to <file>.bak-<ts> before writing
 #   --force            Overwrite existing files
@@ -30,7 +30,7 @@ fi
 
 # --- defaults / arg parsing -------------------------------------------------
 TARGET=""; NAME=""; PROFILE="data"; PYTHON="3.11"
-NO_DATA=false; NO_CI=false; NO_MCP=false
+NO_DATA=false; NO_GITHUB=false; NO_MCP=false
 FORCE=false; BACKUP=false; DRYRUN=false
 
 while [[ $# -gt 0 ]]; do
@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
     --profile)  PROFILE="$2"; shift 2 ;;
     --python)   PYTHON="$2"; shift 2 ;;
     --no-data)  NO_DATA=true; shift ;;
-    --no-ci)    NO_CI=true; shift ;;
+    --no-github) NO_GITHUB=true; shift ;;
     --no-mcp)   NO_MCP=true; shift ;;
     --force)    FORCE=true; shift ;;
     --backup)   BACKUP=true; shift ;;
@@ -61,7 +61,7 @@ TS="$(date +%Y%m%d-%H%M%S)"
 # profile gates
 WANT_PY=true;   [[ "$PROFILE" == minimal ]] && WANT_PY=false
 WANT_DATA=false; { [[ "$PROFILE" == data ]] && [[ "$NO_DATA" == false ]]; } && WANT_DATA=true
-WANT_CI=true;   { [[ "$NO_CI" == true ]] || [[ "$PROFILE" == minimal ]]; } && WANT_CI=false
+WANT_GITHUB=true; { [[ "$NO_GITHUB" == true ]] || [[ "$PROFILE" == minimal ]]; } && WANT_GITHUB=false
 WANT_MCP=true;  [[ "$NO_MCP" == true ]] && WANT_MCP=false
 
 # dependency set per profile
@@ -147,7 +147,7 @@ else
 fi
 
 # 7. CI + smoke test
-if $WANT_CI; then
+if $WANT_GITHUB; then
   mkdirp "$TARGET/.github/workflows"; mkdirp "$TARGET/tests"
   emit_render "$TPL/ci.yml.tmpl" "$TARGET/.github/workflows/ci.yml"
   emit "$TARGET/tests/test_smoke.py" < "$TPL/test_smoke.py"

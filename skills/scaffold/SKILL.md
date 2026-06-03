@@ -17,7 +17,7 @@ gathers the inputs, runs it, and then guides the human-judgment part (Domain Con
    - Profile: `data` (default — data-eng archetype with `data/{bronze,silver,gold}`),
      `python` (plain uv lib), or `minimal` (beads + docs only).
    - Whether to include `.mcp.json` (playwright/context7) — keep it for scraping/web projects, drop with `--no-mcp` otherwise.
-   - CI is on by default (closes the portfolio's CI gap); drop with `--no-ci` only if there's a reason.
+   - CI is on by default (closes the portfolio's CI gap); drop with `--no-github` only if there's a reason.
 
 2. **Dry-run first.** Run the script with `--dry-run` and show the planned actions:
    ```bash

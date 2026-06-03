@@ -24,7 +24,7 @@ identified (only 3 of 83 repos had active CI).
 --profile P        data | python | minimal   (default: data)
 --python X.Y       Python version (default: 3.11)
 --no-data          Skip data/{bronze,silver,gold}
---no-ci            Skip GitHub Actions CI + smoke test
+--no-github        Skip GitHub Actions CI + smoke test
 --no-mcp           Skip .mcp.json (playwright/context7)
 --backup           Back up existing files to <file>.bak-<ts>
 --force            Overwrite existing files
