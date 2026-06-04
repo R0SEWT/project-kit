@@ -54,7 +54,7 @@ done
 case "$PROFILE" in data|python|minimal) ;; *) echo "error: --profile must be data|python|minimal" >&2; exit 1 ;; esac
 [[ -n "$NAME" ]] || NAME="$(basename "$TARGET")"
 
-PKG="$(printf '%s' "$NAME" | sed -e 's/[^A-Za-z0-9]/_/g' | tr 'A-Z' 'a-z')"
+PKG="$(printf '%s' "$NAME" | sed -e 's/[^A-Za-z0-9]/_/g' | tr '[:upper:]' '[:lower:]')"
 TARGET_VERSION="py${PYTHON//./}"
 TS="$(date +%Y%m%d-%H%M%S)"
 
