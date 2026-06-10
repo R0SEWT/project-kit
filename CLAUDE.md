@@ -27,8 +27,9 @@ Two skills sit over a deterministic core:
 | File | Purpose |
 |------|---------|
 | `scripts/scaffold.sh` | Deterministic scaffold engine (safety model, profiles, render) |
+| `scripts/protect-branch.sh` | Post-push: apply the solo-dev branch protection (PR + CI + conversation-resolution) via `gh` |
 | `templates/*.tmpl` | Rendered files (`{{name}}`, `{{pkg}}`, `{{python}}`, `{{target_version}}`, `{{deps}}`) |
-| `templates/*` (no `.tmpl`) | Copied verbatim (settings, gitignore, AGENTS.md, test_smoke.py, dependabot.yml, pull_request_template.md, CODEOWNERS) |
+| `templates/*` (no `.tmpl`) | Copied verbatim (settings, gitignore, gitattributes, AGENTS.md, test_smoke.py, dependabot.yml, pull_request_template.md, CODEOWNERS, session-close-pr.md) |
 | `.claude-plugin/plugin.json` | Plugin manifest |
 | `.claude-plugin/marketplace.json` | Marketplace manifest (`project-kit-local`) |
 | `catalog/setup-options.md` | Append-only research log |

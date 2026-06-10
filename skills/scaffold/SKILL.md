@@ -38,6 +38,15 @@ gathers the inputs, runs it, and then guides the human-judgment part (Domain Con
 
 5. **Report** what was created/skipped and the next steps the script printed.
 
+6. **After the first push** (once the repo exists on GitHub), enforce the PR flow the scaffold
+   assumes — a protected `main` with no unsatisfiable approval gate:
+   ```bash
+   "$CLAUDE_PLUGIN_ROOT/scripts/protect-branch.sh" <owner/repo>
+   ```
+   This requires a PR and gates merges on CI + resolved review conversations (no approval count —
+   see `SETUP-CHECKLIST.md` §1 for the solo-dev rationale). Then enable Copilot/Sourcery auto-review
+   in repo settings so those comments become the binding review.
+
 ## Notes
 - beads is per-project here: the script runs a fresh `bd init` (it auto-detects the issue prefix).
 - After scaffolding, `bd ready` should work inside the new project for task tracking.

@@ -108,6 +108,17 @@ emit() { # reads content from stdin → $1, honoring the safety model
   note "create: $dest"; CREATED=$((CREATED+1))
 }
 
+append_once() { # append template $1 to existing doc $2 unless marker $3 is already present
+  local src="$1" dest="$2" marker="$3"
+  if $DRYRUN; then note "would append: $(basename "$src") -> $dest"; CREATED=$((CREATED+1)); return 0; fi
+  [[ -f "$dest" ]] || { note "skip append (missing): $dest"; return 0; }
+  if grep -qF "$marker" "$dest" 2>/dev/null; then
+    note "skip append (present): $dest"; SKIPPED=$((SKIPPED+1)); return 0
+  fi
+  { printf '\n'; cat "$src"; } >> "$dest"
+  note "append: $(basename "$src") -> $dest"; CREATED=$((CREATED+1))
+}
+
 # --- scaffold ---------------------------------------------------------------
 echo "project-kit: scaffolding '$NAME' (profile=$PROFILE, python=$PYTHON) into $TARGET"
 $DRYRUN && echo "  [dry-run — no changes will be made]"
@@ -120,9 +131,10 @@ if $WANT_DATA; then mkdirp "$TARGET/data/bronze"; mkdirp "$TARGET/data/silver"; 
 # 2. git
 [[ -d "$TARGET/.git" ]] || runin "$TARGET" git init -q
 
-# 3. pyproject + gitignore
+# 3. pyproject + gitignore + gitattributes
 if $WANT_PY; then emit_render "$TPL/pyproject.toml.tmpl" "$TARGET/pyproject.toml"; fi
 emit "$TARGET/.gitignore" < "$TPL/gitignore"
+emit "$TARGET/.gitattributes" < "$TPL/gitattributes"
 
 # 4. .claude settings
 mkdirp "$TARGET/.claude"
@@ -144,6 +156,14 @@ elif command -v bd >/dev/null 2>&1; then
   runin "$TARGET" bd init
 else
   note "bd not found on PATH — install beads, then run 'bd init' here"
+fi
+
+# 6b. PR-flow session-close override. Only with GitHub hygiene (protected main + PRs).
+# Appended after bd init so it sits alongside the trunk-based beads block it supersedes.
+if $WANT_GITHUB; then
+  for _doc in AGENTS.md CLAUDE.md; do
+    append_once "$TPL/session-close-pr.md" "$TARGET/$_doc" "Session Close (PR flow"
+  done
 fi
 
 # 7. GitHub collaboration hygiene (CI + smoke test, dependabot, PR template, CODEOWNERS)

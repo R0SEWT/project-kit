@@ -11,12 +11,27 @@ advanced secrets — is deliberately out of scope; add it when the need shows up
 ## 1. Branch protection / require review
 
 Settings → Rules → Rulesets (or Branches → branch protection) on the default branch: require a pull
-request before merging, and require N approvals.
+request before merging, gate it on CI, and — working solo — **require conversation resolution instead
+of approvals**.
 
-**Solo-dev trap.** On your own PR your *own* approval doesn't count toward the required number —
-someone else must approve. And a `* @owner` line in `CODEOWNERS` makes you required-reviewer of
-everything, which can block your own merge. Working solo: either don't require approvals, or require
-them knowing you need a second human (or account) to satisfy the gate.
+**Recommended solo-dev config** — exactly what `scripts/protect-branch.sh` applies:
+- Require a pull request before merging, with **0 required approvals**.
+- Require the CI status check (`test`) to pass, branch up to date (`strict`).
+- **Require conversation resolution before merging.**
+- Leave admins un-enforced (`enforce_admins: false`) — an escape hatch if CI ever wedges.
+
+One command (needs `gh`, authenticated, admin on the repo):
+
+```bash
+scripts/protect-branch.sh <owner/repo>     # protects main; --branch / --check NAME to override
+```
+
+**Solo-dev trap — why approvals don't work.** On your own PR your *own* approval doesn't count toward
+the required number, and GitHub blocks self-approval, so someone else would have to approve. A
+`* @owner` line in `CODEOWNERS` makes you required-reviewer of everything, which can block your own
+merge too. A `required_approving_review_count: 1` on a solo repo is therefore **unsatisfiable** — every
+merge would need `--admin`, which bypasses CI (security theater). Require **conversation resolution**
+instead: it makes review comments a real merge gate without needing a human Approve.
 
 ## 2. Copilot automatic code review
 
@@ -26,10 +41,12 @@ why it's here and not in the scaffold. Enable it under Settings → Rules → Ru
 pull request before merging" gate). Requires a **paid Copilot plan** — Copilot Pro ($10/mo) is the
 entry tier; org members can use it with no license if the org enables the policy.
 
-**Trap.** Copilot's review is always a **Comment** — never Approve or Request-changes — so it does
-**not** satisfy a require-approval rule. Pairing auto-review with require-approval on a solo repo
-still leaves you unable to merge without a human Approve. Treat Copilot review as a signal, not a
-merge gate.
+**Trap — and the fix.** Copilot's review is always a **Comment** — never Approve or Request-changes —
+so it does **not** satisfy a require-approval rule. Pairing auto-review with require-*approval* on a
+solo repo leaves you unable to merge without a human Approve. But pair it with require **conversation
+resolution** (§1) and its comments *do* become a binding soft-gate: every Copilot/Sourcery thread must
+be resolved before the PR can merge, no human Approve required. That's the combination — auto-review
+for the signal, conversation-resolution to make it stick.
 
 ## Note — Actions billing (awareness, not a step)
 

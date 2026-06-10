@@ -1,0 +1,2 @@
+# Beads exports its issue log here; union-merge so parallel branches don't conflict.
+.beads/issues.jsonl merge=union
