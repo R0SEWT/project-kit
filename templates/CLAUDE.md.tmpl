@@ -30,6 +30,10 @@
 <!-- Adjust/remove if this is not a data project. Defaults reflect the medallion + polars/duckdb stack. -->
 
 - **Layers**: raw → `data/bronze/`, cleaned → `data/silver/`, analytic → `data/gold/`. All gitignored.
+- **Where it lives**: <!-- fill: gitignored data still needs a home — say where each layer lives and how
+  to rebuild it: regenerable from source (the command) · remote silver via `$SILVER` · a private HF
+  Storage Bucket for working data · an HF dataset repo (card + license) for data you publish.
+  Never publish third-party or personal data. See catalog/setup-options.md in project-kit. -->
 - **Polars over pandas** everywhere; only drop to numpy when a library requires it.
 - **DuckDB for SQL joins** across parquet; Polars for local transforms.
 - **Remote silver**: reference the remote root via `$SILVER` in SQL when pulling shared data.
