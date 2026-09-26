@@ -48,6 +48,24 @@ not signal stability. A small wording change can alter agent behavior: classify
 the observed contract impact, not the number of edited lines. Record candidate
 versions as prereleases and validate them before advertising a stable release.
 
+## Relation to the plugin version
+
+Capabilities in this repository reach consumers through the Claude Code plugin.
+The host installs it into a cache directory named after the `version` field of
+`.claude-plugin/plugin.json` (for example
+`~/.claude/plugins/cache/project-kit-local/project-kit/0.1.0/`) and records the
+commit it installed. Changing files without changing that field can leave
+installed copies on the old files.
+
+- A PR that releases a capability shipped by the plugin also bumps the plugin
+  `version`, at least as far as the largest capability bump it contains. Under
+  0.x, an incompatible capability change bumps the plugin MINOR.
+- The plugin version is the distribution version; capability versions stay in
+  their own release notes. Never reuse a plugin version for different contents.
+- In the consumer inventory, a capability loaded through the plugin records the
+  plugin version and the installed commit from the host's install record as its
+  revision, instead of hashes of copied files.
+
 ## Pinning in a consumer repo
 
 Maintain `docs/capabilities.md` as a human-reviewed inventory initially. For each
