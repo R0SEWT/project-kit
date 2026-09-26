@@ -15,6 +15,13 @@ identified (only 3 of 83 repos had active CI).
 | scaffold | `/project-kit:scaffold` | Lay down the standard scaffold into a new project, then help fill `CLAUDE.md`. |
 | research-setup | `/project-kit:research-setup <need>` | Research, score, and record a candidate tool; wire it in if adopted. |
 
+## Agent workflow laboratory
+
+Use a dedicated lab branch to trial skills, playbooks and runbooks, then promote
+validated changes through small PRs. See the [laboratory playbook](docs/agent-workflow-lab.md)
+and its [experiment record](docs/experiments/TEMPLATE.md). This is an opt-in
+manual workflow; scaffolding does not create branches or install capabilities.
+
 ## The scaffold
 
 `scripts/scaffold.sh <target-dir> [options]` does the deterministic work (the skill drives it):
