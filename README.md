@@ -66,6 +66,13 @@ Or add to `~/.claude/settings.json`:
 Restart the session for Claude Code to load the plugin. To use the script standalone, set
 `PROJECT_KIT_HOME` to this repo (defaults to `~/Code/project-kit`).
 
+## Capability versioning
+
+The [capability versioning contract](docs/capability-versioning.md) defines how
+skills, playbooks and runbooks are released, pinned and upgraded per repository.
+The first pilot is manual; a package manager and generated lockfile are not
+implemented by this contract.
+
 ## Requirements
 
 `bd` (beads) and `uv` on PATH for those steps; the script prints a hint and continues if either is missing.
