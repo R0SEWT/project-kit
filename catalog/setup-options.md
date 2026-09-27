@@ -61,6 +61,8 @@ it is ours to publish.
 - **Wiring**: not a default. `templates/CLAUDE.md.tmpl` gains a "Where it lives" fill prompt in Data
   Conventions listing these options next to `$SILVER` and regenerate-from-source, so every new data
   project states where its gitignored data lives and how to rebuild it.
+  A deliberate exception to wiring only adopted tools: the prompt asks the question and lists the
+  options, but installs no HF tooling. Ships in plugin 0.2.0.
 
 ## 2026-06-02 — an MCP for SQLite
 
