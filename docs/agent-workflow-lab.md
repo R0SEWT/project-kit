@@ -11,9 +11,14 @@ Start from a clean checkout and fetch the current base:
 ```bash
 git status --short
 git fetch origin
-git worktree add -b lab/agent-workflows ../project-kit-agent-lab origin/main
+git worktree add --no-track -b lab/agent-workflows ../project-kit-agent-lab origin/main
 cd ../project-kit-agent-lab
+git push -u origin lab/agent-workflows
 ```
+
+`--no-track` keeps the lab branch from tracking `main`: otherwise a routine
+`git pull --rebase` rebases the lab history onto `main`, and `git push` targets
+the wrong branch.
 
 Stop if the status output contains changes: commit or preserve them deliberately.
 If the branch or worktree already exists, reuse it after inspecting its status;
@@ -23,9 +28,17 @@ branch and as a prefix for other branches.
 
 Run experiments against disposable fixtures or a dedicated consumer worktree.
 An agent may read the checked-out documentation immediately, while an installed
-plugin may still be loading its cached release. Record the actual source path
-and commit used. Follow the host's reload procedure in a fresh session and
-verify that the experimental skill is loaded before evaluating it.
+plugin may still be loading its cached release. The installed plugin is
+served from its cache (`~/.claude/plugins/cache/.../<version>/`), never from the
+lab worktree, so reloading does not pick up lab changes. Start a fresh session
+that loads the lab copy for that session only:
+
+```bash
+claude --plugin-dir ../project-kit-agent-lab
+```
+
+Record the actual source path and commit used, and verify that the experimental
+skill is loaded before evaluating it.
 
 ## Keep an experiment record
 
