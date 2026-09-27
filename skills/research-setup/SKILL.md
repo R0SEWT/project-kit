@@ -13,7 +13,7 @@ into concrete wiring in the kit. This keeps the setup evolving instead of frozen
 - **Profile / values** (from github-map): applied ML + data engineering with **own data and
   Peruvian regional domain** as the differentiator; reproducibility; agentic dev (Claude Code + beads).
 - **Already installed** (don't re-propose / weigh overlap): `superpowers`, `frontend-design`,
-  `github-map` plugins; `playwright` + `context7` MCP servers.
+  `github-map`, `claude-scholar`, `exa` plugins; `playwright` + `context7` MCP servers.
 
 ## Workflow
 
