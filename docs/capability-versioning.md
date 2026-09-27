@@ -58,13 +58,17 @@ commit it installed. Changing files without changing that field can leave
 installed copies on the old files.
 
 - A PR that releases a capability shipped by the plugin also bumps the plugin
-  `version`, at least as far as the largest capability bump it contains. Under
-  0.x, an incompatible capability change bumps the plugin MINOR.
+  `version` by the largest capability bump it contains. While the plugin is 0.x,
+  shift one level down: an incompatible change bumps MINOR, anything else PATCH.
 - The plugin version is the distribution version; capability versions stay in
   their own release notes. Never reuse a plugin version for different contents.
 - In the consumer inventory, a capability loaded through the plugin records the
   plugin version and the installed commit from the host's install record as its
   revision, instead of hashes of copied files.
+- Install from a clean checkout. For a local-directory marketplace the host
+  copies the working tree, so uncommitted edits would land in a cache that
+  matches no commit, and rolling back to the recorded commit would not
+  reproduce what was loaded.
 
 ## Pinning in a consumer repo
 
@@ -76,7 +80,7 @@ capability record the following fields:
 | ID and version | Capability name and declared release |
 | Source | Repository URL and source subdirectory |
 | Revision | Full immutable Git commit SHA; a branch or tag alone is insufficient |
-| Installed files | Exact destination paths and file hashes |
+| Installed files | Copied capabilities: exact destination paths and file hashes. Plugin-loaded: plugin version and install commit (see above) |
 | Dependencies | Capability IDs with tested exact revisions |
 | Configuration | Local non-secret configuration paths |
 | Validation | Evidence record and consumer commit tested |
@@ -89,8 +93,10 @@ the repository already enforces it automatically.
 ## Update and rollback
 
 1. Review candidate release notes, source diff and changed dependencies.
-2. In a lab worktree, compare installed hashes with the inventory. Stop if local
-   changes are unexplained; preserve and reconcile them before replacement.
+2. In a lab worktree, compare what is installed with the inventory: file
+   hashes for copied capabilities, plugin version and commit for plugin-loaded
+   ones. Stop if local changes are unexplained; preserve and reconcile them
+   before replacement.
 3. Update only the declared managed files. Preserve project configuration and
    inspect any dependency or permission expansion.
 4. Execute baseline, candidate and recovery cases. Record actual source revision
