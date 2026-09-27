@@ -64,6 +64,42 @@ it is ours to publish.
   A deliberate exception to wiring only adopted tools: the prompt asks the question and lists the
   options, but installs no HF tooling. Ships in plugin 0.2.0.
 
+## 2026-09-11 — tooling for a verified literature review (+ BibTeX for a LaTeX report)
+
+Need: find, verify and cite ~9 recent papers (≤5 years) for a course deliverable, and produce a
+`.bib` for a LaTeX report. Constraints: every DOI/venue/figure must be checkable (the deliverable
+is graded on source quality), no paid API, and it must work from the CLI.
+
+- **Candidate**: `claude-scholar` plugin — already installed (`openalex`, `doi-bibtex`,
+  `check-refs`, `arxiv-metadata` skills)
+  - What it does: OpenAlex queries, DOI → BibTeX, and a reference checker for LaTeX `.bib` files.
+  - Fit: strong. No key, free, and `check-refs` closes the loop against the written report — which
+    matches the reproducibility value better than a search-only tool.
+  - Maintenance: installed plugin, in use.
+  - Verdict: **adopt** — primary tool. Used for the PC1 review in `cursos/concurrente` (R0SEWT/concurrente#5).
+- **Candidate**: direct REST calls to OpenAlex + Crossref + `doi.org` content negotiation (curl)
+  - What it does: same data, one layer down; `api.crossref.org/works?query.bibliographic=` turned
+    out to be **better than OpenAlex for CS venues** (found the ICPP/IEEE Access papers that
+    OpenAlex relevance search buried), and `Accept: application/x-bibtex` on `doi.org` gives BibTeX.
+  - Verdict: **adopt** as the fallback whenever a skill's results look thin. Worth knowing that
+    OpenAlex `title_and_abstract.search` silently misses records with no stored abstract.
+- **Candidate**: an academic MCP server — ScholarMCP (https://github.com/lstudlo/scholarmcp),
+  `openags/paper-search-mcp` (https://github.com/openags/paper-search-mcp),
+  `oksure/openalex-research-mcp` (https://github.com/oksure/openalex-research-mcp)
+  - What they do: wrap OpenAlex/Crossref/Semantic Scholar/arXiv search, PDF ingestion, citation export.
+  - Fit: heavy overlap with `claude-scholar` + `exa`, both already installed. PDF ingestion is the
+    only real gap, and it did not come up: the deliverable needs metadata and DOIs, not full texts.
+  - Verdict: **reject** for the template — revisit only if a project needs bulk PDF ingestion.
+- **Candidate**: `exa` plugin (installed) for discovery
+  - Verdict: **trial**, complementary — good at finding the *non-indexed* material (vendor blogs,
+    a paper accepted but not yet in a DOI registry), weak for bibliographic metadata.
+    It runs on a metered Exa API key, so under the no-paid-API constraint it stays optional —
+    never part of the required verification path.
+- **Friction found**: the **dblp API is behind a bot check** (`dblp.org/search/publ/api` returns an
+  Anubis HTML challenge, HTTP 200). Don't script it; use Crossref for CS-venue coverage instead.
+- **Wiring**: none. All adopted pieces are already installed or plain `curl`; nothing to add to
+  `templates/`. Recorded here so the next literature task starts with Crossref in hand.
+
 ## 2026-06-02 — an MCP for SQLite
 
 Need: an MCP server to let Claude query a local SQLite DB. Constraint: must fit the local data
