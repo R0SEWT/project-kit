@@ -207,4 +207,5 @@ Next steps:
   - Fill in CLAUDE.md (Domain Context, Architecture, Key Files)
   - bd ready                 # start tracking work
   - git add -A && git commit # first commit
+  - After the first push: https://github.com/R0SEWT/project-kit/blob/main/SETUP-CHECKLIST.md
 EOF
