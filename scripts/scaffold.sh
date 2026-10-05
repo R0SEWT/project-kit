@@ -260,4 +260,5 @@ Next steps:
   - Run the CI gate from a CLEAN clone (gitignored-but-required files only fail there)
   - bd ready                 # start tracking work
   - git add -A && git commit # first commit
+  - After the first push: https://github.com/R0SEWT/project-kit/blob/main/SETUP-CHECKLIST.md
 EOF
