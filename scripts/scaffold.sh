@@ -55,6 +55,7 @@ case "$PROFILE" in data|python|minimal) ;; *) echo "error: --profile must be dat
 [[ -n "$NAME" ]] || NAME="$(basename "$TARGET")"
 
 PKG="$(printf '%s' "$NAME" | sed -e 's/[^A-Za-z0-9]/_/g' | tr '[:upper:]' '[:lower:]')"
+BD_PREFIX="$(printf '%s' "$NAME" | sed -e 's/[^A-Za-z0-9]/-/g' | tr '[:upper:]' '[:lower:]')"
 TARGET_VERSION="py${PYTHON//./}"
 TS="$(date +%Y%m%d-%H%M%S)"
 
@@ -123,9 +124,22 @@ append_once() { # append template $1 to existing doc $2 unless marker $3 is alre
 echo "project-kit: scaffolding '$NAME' (profile=$PROFILE, python=$PYTHON) into $TARGET"
 $DRYRUN && echo "  [dry-run — no changes will be made]"
 
+# Preflight: a case-variant agents.md is a different file on Linux, and bd init writes its own
+# AGENTS.md next to it — two instruction files. Make the human rename/merge it first.
+_agents_variant="$(find "$TARGET" -maxdepth 1 -iname 'agents.md' ! -name 'AGENTS.md' -print -quit 2>/dev/null || true)"
+if [[ -n "$_agents_variant" ]]; then
+  echo "error: $(basename "$_agents_variant") exists — rename/merge it first (e.g. git mv $(basename "$_agents_variant") docs/), then re-run." >&2
+  $DRYRUN || exit 1
+fi
+
 mkdirp "$TARGET"
 
-$WANT_PY  && mkdirp "$TARGET/src/$PKG"
+# Existing Python project: keep its package layout — don't invent src/<pkg> next to it.
+EXISTING_PY=false; [[ -f "$TARGET/pyproject.toml" ]] && EXISTING_PY=true
+if $WANT_PY; then
+  if $EXISTING_PY; then note "skip (existing project): src/$PKG — keeping the current package layout"
+  else mkdirp "$TARGET/src/$PKG"; fi
+fi
 if $WANT_DATA; then mkdirp "$TARGET/data/bronze"; mkdirp "$TARGET/data/silver"; mkdirp "$TARGET/data/gold"; fi
 
 # 2. git
@@ -153,9 +167,43 @@ emit_render "$TPL/CLAUDE.md.tmpl" "$TARGET/CLAUDE.md"
 if [[ -d "$TARGET/.beads" ]]; then
   note "skip (exists): .beads/ — not running bd init"
 elif command -v bd >/dev/null 2>&1; then
-  runin "$TARGET" bd init
+  # bd init copies the git `origin` into sync.remote AND the Dolt remote, then commits on the
+  # current branch. On a client/third-party repo that means `bd dolt push` publishes the issue
+  # DB there. Surface it loudly; repointing is the human's call.
+  _origin="$(git -C "$TARGET" remote get-url origin 2>/dev/null || true)"
+  _branch="$(git -C "$TARGET" branch --show-current 2>/dev/null || true)"
+  if [[ "$_branch" == main || "$_branch" == master ]] && git -C "$TARGET" rev-parse -q --verify HEAD >/dev/null 2>&1; then
+    note "WARN: bd init will commit on '$_branch' — switch to a branch first if main is shared/protected"
+  fi
+  runin "$TARGET" bd init --prefix "$BD_PREFIX"
+  if [[ -n "$_origin" ]]; then
+    note "WARN: beads will sync its issue DB (refs/dolt/data) to: $_origin"
+    note "      not yours? repoint both:  bd dolt remote remove origin && bd dolt remote add origin <url>"
+    note "                                and edit sync.remote in .beads/config.yaml"
+  fi
 else
   note "bd not found on PATH — install beads, then run 'bd init' here"
+fi
+
+# 6a. bd init rewrites .claude/settings.json hooks (keeps only its SessionStart). Re-add any
+# `bd prime` hook event from the template that is missing (e.g. PreCompact), keeping the rest.
+if [[ -f "$TARGET/.claude/settings.json" ]]; then
+  if $DRYRUN; then note "would ensure bd prime hooks in: $TARGET/.claude/settings.json"
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 - "$TARGET/.claude/settings.json" "$TPL/claude-settings.json" <<'PY'
+import json, sys
+dest, tpl = sys.argv[1], sys.argv[2]
+cur, ref = json.load(open(dest)), json.load(open(tpl))
+hooks = cur.setdefault("hooks", {})
+added = []
+for ev, spec in ref["hooks"].items():
+    if ev not in hooks:
+        hooks[ev] = spec
+        added.append(ev)
+json.dump(cur, open(dest, "w"), indent=2); open(dest, "a").write("\n")
+print(f"  ensure: bd prime hooks {added or '(already present)'} -> {dest}")
+PY
+  else note "python3 not found — check the SessionStart/PreCompact 'bd prime' hooks in .claude/settings.json"; fi
 fi
 
 # 6b. PR-flow session-close override. Only with GitHub hygiene (protected main + PRs).
@@ -181,7 +229,11 @@ if $WANT_GITHUB; then
   fi
   mkdirp "$TARGET/.github/workflows"; mkdirp "$TARGET/tests"
   emit_render "$TPL/ci.yml.tmpl" "$TARGET/.github/workflows/ci.yml"
-  emit "$TARGET/tests/test_smoke.py" < "$TPL/test_smoke.py"
+  if compgen -G "$TARGET/tests/test_*.py" >/dev/null; then
+    note "skip (real tests exist): tests/test_smoke.py"; SKIPPED=$((SKIPPED+1))
+  else
+    emit "$TARGET/tests/test_smoke.py" < "$TPL/test_smoke.py"
+  fi
   emit "$TARGET/.github/dependabot.yml" < "$TPL/dependabot.yml"
   emit "$TARGET/.github/pull_request_template.md" < "$TPL/pull_request_template.md"
   emit "$TARGET/.github/CODEOWNERS" < "$TPL/CODEOWNERS"
@@ -205,6 +257,7 @@ cat <<EOF
 Next steps:
   cd $TARGET
   - Fill in CLAUDE.md (Domain Context, Architecture, Key Files)
+  - Run the CI gate from a CLEAN clone (gitignored-but-required files only fail there)
   - bd ready                 # start tracking work
   - git add -A && git commit # first commit
 EOF

@@ -47,6 +47,25 @@ gathers the inputs, runs it, and then guides the human-judgment part (Domain Con
    see `SETUP-CHECKLIST.md` §1 for the solo-dev rationale). Then enable Copilot/Sourcery auto-review
    in repo settings so those comments become the binding review.
 
+## Adopting an existing repo (brownfield)
+
+Learned retrofitting a client repo — check these before step 3:
+- **Branch first.** `bd init` commits on the current branch.
+- **Whose `origin` is it?** `bd init` copies `origin` into `sync.remote` and the Dolt remote, so
+  `bd dolt push` would publish the issue DB there. On a client/org repo, repoint both to your own
+  remote (the script prints the commands) — `git remote set-url --push` does NOT cover it.
+- **Profile `python`**, not `data`: the existing layout (`data/raw`, `src/` package) stays; the
+  script now skips `src/<pkg>`, `test_smoke.py` (if real tests exist) and merges missing
+  `bd prime` hooks into an existing `.claude/settings.json`.
+- **Lowercase `agents.md`** blocks `AGENTS.md` (Linux is case-sensitive): `git mv` it (e.g. to
+  `docs/`) and fold its domain content into CLAUDE.md.
+- **Fill CLAUDE.md from what exists** (readme, specs, ADRs). Drop template defaults that
+  contradict the codebase (e.g. "Polars over pandas" in a pandas project).
+- **Lint debt:** the CI template runs `ruff check .` — exclude notebooks, apply safe `--fix`,
+  `noqa` with a reason anything that would change behavior.
+- **Verify from a clean clone** (or watch the first CI run): gitignored files the code needs at
+  import time (e.g. `config/*.yml`) pass locally and fail in CI.
+
 ## Notes
 - beads is per-project here: the script runs a fresh `bd init` (it auto-detects the issue prefix).
 - After scaffolding, `bd ready` should work inside the new project for task tracking.
