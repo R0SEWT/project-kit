@@ -73,6 +73,17 @@ Or add to `~/.claude/settings.json`:
 Restart the session for Claude Code to load the plugin. To use the script standalone, set
 `PROJECT_KIT_HOME` to this repo (defaults to `~/Code/project-kit`).
 
+## Global installs (optional, outside the scaffold)
+
+Tools the research log adopted for needs that not every project has. They are installed once per
+machine, not by `scripts/scaffold.sh`; see `catalog/setup-options.md` for the verdicts.
+
+| Need | Install | Verdict |
+|------|---------|---------|
+| Editable diagrams that export to PNG/SVG for a report | `/plugin marketplace add jgraph/drawio-mcp` then `/plugin install drawio@drawio` | adopt (2026-11-02) |
+| Programmatic video and animated diagrams | `npx skills add remotion-dev/skills -g` (needs Node and Chrome) | trial (2026-11-02) |
+| Algorithm and math animations in Python | `uv add --dev manim` in the project | trial (2026-11-02) |
+
 ## Capability versioning
 
 The [capability versioning contract](docs/capability-versioning.md) defines how

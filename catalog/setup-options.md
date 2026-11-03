@@ -20,6 +20,51 @@ Format per entry:
 
 <!-- entries below -->
 
+## 2026-11-02 — diagrams for a Quarto→Word report and animated diagrams for a project video
+
+Need: (a) architecture and pipeline diagrams that land as PNG in a Quarto→Word report and stay
+editable, and (b) animated diagrams (a concurrent pipeline, K-Means iterating) for a graded project
+video. Constraint: CLI-driven, free, reproducible from the repo; no paid API. Context: TB2 of the
+concurrency course (`aire-distribuido`), where the video was first assembled by hand with
+asciinema + edge-tts + ffmpeg.
+
+- **Candidate**: draw.io official plugin + MCP (https://github.com/jgraph/drawio-mcp)
+  - What it does: the `drawio` skill writes native `.drawio` files from XML/Mermaid, exports PNG/SVG/PDF
+    with the XML embedded (so the export stays editable), or opens a URL in app.diagrams.net; the same
+    repo ships `@drawio/mcp` (stdio tool server) and a hosted MCP App server; `search_shapes` covers
+    10,000+ shapes (AWS, Azure, GCP, Kubernetes, UML, BPMN).
+  - Fit: strong. Report diagrams become a versioned `.drawio` next to the PNG, which is what the
+    reproducibility value asks for. Mermaid input means the diagrams in `CLAUDE.md`/docs can be reused.
+    PNG export needs draw.io Desktop; the URL route needs nothing. No overlap with installed tools.
+  - Maintenance: ★5.7k, Apache-2.0, pushed 2026-11-02; npm `@drawio/mcp` 1.10.1 (2026-10-30).
+  - Verdict: **adopt** — official, zero-config, and it fills a gap every report-bearing project has.
+  - Wiring: README "Global installs" lists the plugin (`/plugin marketplace add jgraph/drawio-mcp`,
+    `/plugin install drawio@drawio`). Not added to `templates/mcp.json.tmpl`: the plugin bundles the MCP.
+- **Candidate**: Remotion Agent Skills (https://github.com/remotion-dev/skills)
+  - What it does: official skills (`/remotion-create`, `/remotion-markup`, `/remotion-render`, captions,
+    maps) for programmatic video in React, rendered headless with Chrome; `npx skills add remotion-dev/skills`.
+  - Fit: good for the video need (animated pipeline, counters, transitions) and far above hand-made
+    ffmpeg montages in polish. Costs a Node/React toolchain in a uv/Python stack, so it stays a
+    per-project install, not a scaffold default. Renders need Chrome (present on this machine).
+  - Maintenance: ★6.1k, pushed 2026-11-02; remotion 4.0.540 on npm (2026-11-02). Free for individuals
+    and small teams (company license above 3 people: check before using at work).
+  - Verdict: **trial** — use it for the TB2 video in `aire-distribuido`; revisit after that render.
+- **Candidate**: Manim skill (https://github.com/awesome-skills/manim-skill) over ManimCE
+  - What it does: a skill that teaches Claude ManimCE 0.22 (Python ≥3.11) for algorithm and math animations.
+  - Fit: ManimCE itself fits the stack perfectly (uv-installable, Python, no Node) and is the better
+    tool for "watch K-Means iterate"; the skill wrapper is tiny (★10) and could be replaced by the
+    ManimCE docs via context7. Overlaps with Remotion for everything that is not math.
+  - Maintenance: skill pushed 2026-10-30, MIT; ManimCE is mature and active.
+  - Verdict: **trial** — only for the algorithm scenes, via `uv add --dev manim`; the skill is optional.
+- **Candidate**: claude-mermaid MCP (https://github.com/veelenga/claude-mermaid)
+  - What it does: live-reload preview of Mermaid diagrams while Claude edits them.
+  - Fit: Mermaid already renders in GitHub and in Quarto, and draw.io accepts Mermaid as input, so the
+    preview is the only thing it adds. Not worth a third diagram tool.
+  - Maintenance: ★221, MIT, pushed 2026-11-02.
+  - Verdict: **reject** — overlap with draw.io (Mermaid input) and with GitHub's own rendering.
+- **Not adopted as defaults**: none of these enter `scripts/scaffold.sh`; diagrams and video are
+  per-project needs, so the kit records them as global/optional installs and the research verdict.
+
 ## 2026-09-24 — a home for a project's gitignored data
 
 Need: every data project gitignores `data/{bronze,silver,gold}`, but the kit never says where that
